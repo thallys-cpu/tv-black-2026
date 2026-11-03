@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>TV da Black</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Libre+Caslon+Condensed:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400..800&display=swap">
+<style id="tv-style">
+html,body{margin:0}[hidden]{display:none!important}
+/* TV do salão no KV da Black ART 2026 (16:9): faixa com relógio, placar com metas, hoje, depois gráfico, pódio, últimas vendas e dica. Navy de fundo, roxo e lilás de apoio, lima = conquista. Visual escuro único, de propósito. */
+:root{
+  --navy:#211E34; --panel:#2A2643; --panel2:#3A2F6E; --line:#3B3560; --off:#F6F3F3; --roxo:#684EBC; --lilas:#8D87C9; --lima:#CCF608; --muted:#B3AEDD; --trilho:#3A3460; --alerta:#FFB547;
+  --display:"Gasoek One",Impact,"Arial Black",sans-serif;
+  --frase:"Libre Caslon Condensed",Georgia,"Times New Roman",serif;
+  --texto:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --gap:clamp(12px,.95vw,20px); --r:16px; --pad:clamp(16px,1.2vw,26px);
+  color-scheme:dark;
+}
+html,body{background:var(--navy);color:var(--off)}
+body{font-family:var(--texto);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.tv{padding:var(--gap);display:grid;gap:var(--gap);min-width:0;min-height:100vh;box-sizing:border-box;
+  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,.95fr);
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+  grid-template-areas:"top top top" "placar placar hoje" "grafico podio ultimas" "dica dica dica"}
+@media (max-width:1100px){.tv{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"top" "placar" "hoje" "grafico" "podio" "ultimas" "dica";padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}}
+.tv b{font-weight:700}
+.tv-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:var(--pad);display:flex;flex-direction:column;gap:clamp(8px,.7vw,14px);min-width:0}
+.tv-eyebrow{font-size:clamp(.7rem,.68vw,.95rem);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tv-h{margin:0;font-family:var(--frase);font-style:italic;font-weight:600;font-size:clamp(1.25rem,1.45vw,2rem);line-height:1.1;color:var(--off)}
+.tv-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.tv-head .tv-eyebrow{white-space:nowrap}
+
+.tv-top{grid-area:top;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:clamp(16px,2vw,40px);border-radius:var(--r);padding:clamp(12px,.9vw,18px) clamp(18px,1.8vw,36px);background:linear-gradient(100deg,var(--navy) 18%,var(--panel2) 55%,var(--roxo) 100%);border:1px solid var(--line);overflow:hidden}
+@media (max-width:1100px){.tv-top{grid-template-columns:minmax(0,1fr)}}
+.tv-marca{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tv-kicker{font-size:clamp(.72rem,.7vw,1rem);letter-spacing:.16em;text-transform:uppercase;color:var(--lima);font-weight:700}
+.tv-titulo{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,3.2vw,4.2rem);line-height:.88;margin:0}
+.tv-tag{font-family:var(--frase);font-style:italic;color:var(--lilas);font-size:clamp(1rem,1.25vw,1.7rem);margin:0}
+.tv-upd{font-size:clamp(.72rem,.68vw,.95rem);color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.tv-upd b{color:var(--off);font-weight:600}
+.tv-feed-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:rgba(33,30,52,.6);color:var(--off);font-weight:600}
+.tv-feed-pill i{width:8px;height:8px;border-radius:50%;background:var(--lima);flex:none}
+.tv-feed-pill.erro i{background:var(--alerta)}
+.tv-relogio{display:flex;flex-direction:column;align-items:center;gap:8px;justify-self:center}
+.tv-fase{font-family:var(--frase);font-style:italic;font-size:clamp(1.05rem,1.3vw,1.8rem);color:var(--off)}
+.tv-clock{display:grid;grid-template-columns:repeat(4,auto);gap:clamp(6px,.6vw,12px)}
+.tv-tile{background:rgba(33,30,52,.78);border:1px solid rgba(204,246,8,.28);border-radius:12px;padding:clamp(6px,.5vw,10px) clamp(10px,.9vw,18px);display:flex;flex-direction:column;align-items:center;min-width:clamp(56px,5.4vw,112px)}
+.tv-tile .d{font-family:var(--display);font-size:clamp(1.9rem,2.6vw,3.5rem);line-height:1;color:var(--lima)}
+.tv-tile .l{font-size:clamp(.6rem,.58vw,.82rem);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:4px}
+.tv-pct{font-family:var(--display);color:var(--lima);font-size:clamp(4.5rem,7vw,9rem);line-height:.8;user-select:none}
+@media (max-width:1100px){.tv-pct{display:none}.tv-relogio{justify-self:start;align-items:flex-start}}
+
+.tv-placar{grid-area:placar}
+.tv-placar-num{display:flex;flex-wrap:wrap;align-items:center;gap:4px 22px}
+.tv-big{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,4.4vw,6rem);line-height:.92;color:var(--lima);white-space:nowrap}
+.tv-sub{font-size:clamp(1rem,1.15vw,1.55rem);color:var(--muted);margin:0}
+.tv-sub b{color:var(--off)}
+.tv-subs{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tv-canais{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 0;font-size:clamp(.9rem,.95vw,1.3rem);color:var(--muted)}
+.tv-canais .c{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.tv-canais b{color:var(--off)}
+.tv-prod{font-size:clamp(.85rem,.85vw,1.15rem);color:var(--muted);margin:0}
+.tv-track{min-height:clamp(54px,3.4vw,70px)}
+.tv-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);padding-top:clamp(10px,.8vw,16px)}
+@media (max-width:700px){.tv-lanes{grid-template-columns:minmax(0,1fr);gap:12px}.tv-lane{border-left:0!important;padding-left:0!important}}
+.tv-lane{display:flex;flex-direction:column;gap:2px;padding-inline:clamp(10px,1vw,20px);border-left:1px solid var(--line);min-width:0}
+.tv-lane:first-child{border-left:0;padding-left:0}
+.tv-lane h3{margin:0;display:flex;align-items:center;gap:8px;font-size:clamp(.85rem,.9vw,1.2rem);font-weight:700;letter-spacing:.02em}
+.tv-lane h3 span{color:var(--muted);font-weight:500}
+.tv-dot{width:10px;height:10px;border-radius:50%;background:var(--lima);flex:none}
+.tv-dot.s{background:var(--lilas)} .tv-dot.m{background:var(--off)}
+.tv-lane .v{font-family:var(--display);font-size:clamp(1.3rem,1.55vw,2.1rem);line-height:1.05;white-space:nowrap}
+.tv-lane .r{font-size:clamp(.8rem,.8vw,1.08rem);color:var(--muted);margin:0}
+.tv-lane .r b{color:var(--off)}
+.tv-lane.ok .v{color:var(--lima)}
+
+.tv-hoje{grid-area:hoje;background:linear-gradient(160deg,var(--panel2),var(--panel) 70%);border-color:var(--roxo)}
+.tv-hoje-num{display:flex;align-items:baseline;gap:10px}
+.tv-hoje-num .n{font-family:var(--display);font-size:clamp(3.4rem,5vw,6.6rem);line-height:.9;color:var(--off)}
+.tv-hoje-num .de{font-size:clamp(1rem,1.15vw,1.55rem);color:var(--muted)}
+.tv-hoje-num .de b{color:var(--lima);font-family:var(--display);font-weight:400;font-size:1.35em}
+.tv-meter{min-height:22px}
+.tv-line{font-size:clamp(.92rem,.95vw,1.3rem);color:var(--muted);margin:0;line-height:1.35}
+.tv-line b{color:var(--off)}
+.tv-line .tv-rec{color:var(--lima)}
+.tv-sep{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
+
+.tv-grafico{grid-area:grafico}
+.tv-podio-card{grid-area:podio}
+.tv-ultimas{grid-area:ultimas}
+.tv-chart{position:relative;min-height:clamp(160px,10.5vw,220px);flex:1}
+.tv-tip{position:absolute;pointer-events:none;background:var(--navy);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.9rem;white-space:nowrap;z-index:2;color:var(--off)}
+.tv-podio{display:flex;flex-direction:column;gap:10px}
+.tv-feed{display:flex;flex-direction:column}
+.tv-vazio{color:var(--muted);font-size:clamp(.9rem,.95vw,1.2rem);margin:0}
+
+.tv-dica-box{grid-area:dica;border-radius:var(--r);background:var(--lima);color:var(--navy);display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:clamp(12px,1.4vw,28px);padding:clamp(12px,1vw,20px) clamp(18px,1.8vw,36px)}
+.tv-dica-box .tv-kicker{color:var(--navy);white-space:nowrap;border-right:2px solid rgba(33,30,52,.35);padding-right:clamp(12px,1.4vw,28px)}
+@media (max-width:700px){.tv-dica-box{grid-template-columns:minmax(0,1fr)}.tv-dica-box .tv-kicker{border:0;padding:0}}
+.tv-dica{font-family:var(--frase);font-style:italic;font-weight:600;font-size:clamp(1.2rem,1.7vw,2.3rem);line-height:1.15;margin:0;text-wrap:balance}
+@media (prefers-reduced-motion:no-preference){.tv-dica{animation:tvIn .6s ease-out}@keyframes tvIn{from{opacity:.15;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<template id="tv-markup"><div class="tv">
+  <header class="tv-top">
+    <div class="tv-marca">
+      <span class="tv-kicker">• Black Friday ART 2026</span>
+      <h1 class="tv-titulo">Black Friday</h1>
+      <p class="tv-tag">Cada venda é uma aprovação a caminho.</p>
+      <span class="tv-upd"><span>Atualizado às <b data-k="atualizado">—</b> · cada venda do site entra aqui em até 1 min</span><span class="tv-feed-pill" data-k="pill" hidden><i></i><span data-k="pilltxt"></span></span></span>
+    </div>
+    <div class="tv-relogio">
+      <span class="tv-fase" data-fase="antes">A Black abre em</span>
+      <span class="tv-fase" data-fase="durante" hidden>A Black fecha em</span>
+      <span class="tv-fase" data-fase="depois" hidden>A Black acabou. Obrigado, time!</span>
+      <div class="tv-clock" data-k="relogio" aria-live="off"></div>
+    </div>
+    <span class="tv-pct" aria-hidden="true">%</span>
+  </header>
+
+  <section class="tv-card tv-placar" aria-label="Placar do time">
+    <div class="tv-head"><span class="tv-eyebrow">Juntos, o time já vendeu</span><span class="tv-eyebrow">Desde 09/10</span></div>
+    <div class="tv-placar-num">
+      <span class="tv-big" data-k="faturado">—</span>
+      <div class="tv-subs">
+        <p class="tv-sub"><b data-k="vendas">—</b> vendas · ticket médio <b data-k="ticket">—</b> · <b data-k="pctmeta">—</b> da meta</p>
+        <p class="tv-prod" data-k="produtos">—</p>
+        <p class="tv-canais"><span class="c"><i class="tv-dot"></i>Comercial <b data-k="com_valor">—</b> <span data-k="com_n"></span></span><span class="c"><i class="tv-dot s"></i>Marketing <b data-k="mkt_valor">—</b> <span data-k="mkt_n"></span></span></p>
+      </div>
+    </div>
+    <div class="tv-track" data-k="trilha"></div>
+    <div class="tv-lanes">
+      <div class="tv-lane" data-lane="Meta"><h3><i class="tv-dot"></i>Meta <span data-f="meta">—</span></h3><span class="v" data-f="falta">—</span><p class="r">faltam · <b data-f="por_dia">—</b> por dia · <b data-f="vendas_dia">—</b> vendas</p></div>
+      <div class="tv-lane" data-lane="Supermeta"><h3><i class="tv-dot s"></i>Supermeta <span data-f="meta">—</span></h3><span class="v" data-f="falta">—</span><p class="r">faltam · <b data-f="por_dia">—</b> por dia · <b data-f="vendas_dia">—</b> vendas</p></div>
+      <div class="tv-lane" data-lane="Megameta"><h3><i class="tv-dot m"></i>Megameta <span data-f="meta">—</span></h3><span class="v" data-f="falta">—</span><p class="r">faltam · <b data-f="por_dia">—</b> por dia · <b data-f="vendas_dia">—</b> vendas</p></div>
+    </div>
+  </section>
+
+  <section class="tv-card tv-hoje" aria-label="Hoje">
+    <div class="tv-head"><h2 class="tv-h">Hoje</h2><span class="tv-eyebrow">Meta do dia</span></div>
+    <div class="tv-hoje-num"><span class="n" data-k="hoje">—</span><span class="de">de <b data-k="hoje_meta">—</b> vendas</span></div>
+    <div class="tv-meter" data-k="medidor"></div>
+    <p class="tv-line">Hoje já entraram <b data-k="fat_hoje">—</b> · mkt: <b data-k="mkt_hoje">—</b></p>
+    <hr class="tv-sep">
+    <p class="tv-line">Recorde do time: <b class="tv-rec" data-k="recorde">—</b> vendas em <b data-k="recdia">—</b>. Bora quebrar?</p>
+    <p class="tv-line">Contando hoje, faltam <b data-k="dias">—</b> dias de venda até 30/11.</p>
+  </section>
+
+  <section class="tv-card tv-grafico"><div class="tv-head"><h2 class="tv-h">Vendas por dia</h2><span class="tv-eyebrow">Desde 09/10</span></div><div class="tv-chart" data-k="diario"></div></section>
+  <section class="tv-card tv-podio-card"><div class="tv-head"><h2 class="tv-h">Destaques da semana</h2><span class="tv-eyebrow">Últimos 7 dias</span></div><div class="tv-podio" data-k="podio"></div></section>
+  <section class="tv-card tv-ultimas"><div class="tv-head"><h2 class="tv-h">Últimas vendas</h2><span class="tv-eyebrow">Ao vivo</span></div><div class="tv-feed" data-k="ultimas"></div></section>
+
+  <div class="tv-dica-box">
+    <span class="tv-kicker">O que mais fecha venda</span>
+    <div>
+      <p class="tv-dica" data-dica>Mande o link na hora em que o lead escolher a opção e acompanhe até o pagamento.</p>
+      <p class="tv-dica" data-dica hidden>Pergunte quanto cabe por mês antes do preço: 12x de R$ 360 vale agora.</p>
+      <p class="tv-dica" data-dica hidden>A condição da Black já vale hoje. Quem ouve "abre dia 03" espera; quem ouve "vale agora" fecha.</p>
+      <p class="tv-dica" data-dica hidden>Medo de não passar? O CFP até passar resolve: R$ 5.000 no PIX ou R$ 6.000 em 12x.</p>
+      <p class="tv-dica" data-dica hidden>Lead sumiu depois do preço? Volte em até 24 h com uma pergunta sobre a dúvida dele, não com "?".</p>
+      <p class="tv-dica" data-dica hidden>Ex-aluno: escute primeiro. Quem se sente reconhecido volta para o Toro.</p>
+    </div>
+  </div>
+</div></template>
+<div id="tv-root"></div>
+<script id="tv-app">
+(() => {
+  /* ---------- Fonte e regras (mesmas da TV anterior) ---------- */
+  const PROD = {'cfp-2027_55': 'CFP', 'cfpatepassar': 'CFP', 'cfg_2026': 'Trilha CFG', 'cga_2026': 'Trilha CFG', 'cge-2026': 'Trilha CFG', 'cfa_2025': 'CFA L1'};
+  const VEND = {'edu-': 'Edu Fattore', 'edufattore': 'Edu Fattore', 'br-': 'Bruno Schwarz', 'brunao': 'Bruno Schwarz', 'mn-': 'Medson Oliveira', 'medsono': 'Medson Oliveira',
+    'mr-': 'Marco Albrecht', 'marcoa': 'Marco Albrecht', 'nl-': 'Natália', 'nataliap': 'Natália', 'gt-': 'Guilherme Toro', 'guitoro': 'Guilherme Toro'};
+  const METAS = [['Meta', 6000000], ['Supermeta', 7500000], ['Megameta', 10000000]];
+  const INICIO = '2026-10-09', FIM = '2026-11-30';
+  const ABRE = new Date('2026-11-03T00:00:00-03:00'), FECHA = new Date('2026-11-30T23:59:59-03:00');
+  const POLL_MS = 60000, BATIMENTO_MS = 30 * 60000;
+
+  /* ---------- Dados carimbados na página ---------- */
+  let DADOS = {at: '', vendas: []};
+  const vendas = () => (DADOS.vendas || []).map(([quando, produto, valor, vendedor]) => ({quando, dia: quando.slice(0, 10), produto, valor, vendedor}));
+
+  /* Linhas da planilha -> vendas no padrão da oferta (sem dados de aluno) */
+  const filtra = (values) => {
+    if (!values || !values.length) return [];
+    const cols = values[0];
+    const out = [];
+    values.slice(1).forEach((r) => {
+      if (!r[0]) return;
+      const o = Object.fromEntries(cols.map((c, i) => [c, r[i] ?? '']));
+      const valor = Number(String(o.valor).replace(/\./g, '').replace(',', '.')) || 0;
+      const pa = PROD[o.curso_a], pb = PROD[o.curso_b], quando = String(o.quando);
+      if (!pa || pa !== pb || quando < INICIO) return;
+      if (!(valor === 3600 || valor === 4320 || (pa === 'CFP' && (valor === 5000 || valor === 6000)))) return;
+      out.push([quando, pa, valor, VEND[o.vendedor] || 'Marketing']);
+    });
+    out.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+    return out;
+  };
+
+  /* ---------- Hora de Brasília ---------- */
+  const spFmt = new Intl.DateTimeFormat('sv-SE', {timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false});
+  const agoraSP = (d = new Date()) => spFmt.format(d).replace(',', '');
+  const hojeSP = () => agoraSP().slice(0, 10);
+
+  /* ---------- Formatos ---------- */
+  const F = {
+    brl: (n) => 'R$ ' + Math.round(Number(n)).toLocaleString('pt-BR'),
+    brlCurto: (n) => { n = Number(n); return n >= 1e6 ? 'R$ ' + (n / 1e6).toLocaleString('pt-BR', {maximumFractionDigits: 1}) + ' mi' : 'R$ ' + Math.round(n / 1e3).toLocaleString('pt-BR') + ' mil'; },
+    int: (n) => Math.round(Number(n)).toLocaleString('pt-BR'),
+    pct: (n) => (Number(n) * 100).toLocaleString('pt-BR', {maximumFractionDigits: 1}) + '%',
+    dm: (s) => String(s).slice(8, 10) + '/' + String(s).slice(5, 7),
+  };
+  const C = {navy: '#211E34', line: '#3B3560', off: '#F6F3F3', roxo: '#684EBC', lilas: '#8D87C9', lima: '#CCF608', muted: '#B3AEDD', trilho: '#3A3460'};
+
+  /* ---------- Contas ---------- */
+  const calcula = () => {
+    const vs = vendas(), hoje = hojeSP();
+    const fat = vs.reduce((a, v) => a + v.valor, 0), n = vs.length;
+    const porDia = {};
+    vs.forEach((v) => { porDia[v.dia] = (porDia[v.dia] || 0) + 1; });
+    const rec = Object.entries(porDia).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0] || ['', 0];
+    const dias = Math.max(1, Math.round((Date.parse(FIM) - Date.parse(hoje)) / 864e5) + 1);
+    const ticket = n ? fat / n : 0;
+    const deHoje = vs.filter((v) => v.dia === hoje);
+    const metas = METAS.map(([nivel, meta]) => {
+      const falta = Math.max(0, meta - fat);
+      return {nivel, meta, falta, pct: fat / meta, por_dia: falta / dias, vendas_dia: Math.ceil(falta / dias / (ticket || 1))};
+    });
+    const diario = [];
+    for (let t = Date.parse(INICIO); t <= Date.parse(hoje); t += 864e5) {
+      const dia = new Date(t).toISOString().slice(0, 10), d = vs.filter((v) => v.dia === dia);
+      diario.push({dia, n: d.length, v: d.reduce((a, x) => a + x.valor, 0)});
+    }
+    const ini = new Date(Date.parse(hoje) - 6 * 864e5).toISOString().slice(0, 10);
+    const s = {};
+    vs.filter((v) => v.dia >= ini && v.dia <= hoje && v.vendedor !== 'Marketing').forEach((v) => {
+      s[v.vendedor] = s[v.vendedor] || {vendedor: v.vendedor, vendas: 0, valor: 0};
+      s[v.vendedor].vendas += 1; s[v.vendedor].valor += v.valor;
+    });
+    const podio = Object.values(s).sort((a, b) => b.vendas - a.vendas || b.valor - a.valor).slice(0, 3);
+    const canal = (mkt) => { const c = vs.filter((v) => (v.vendedor === 'Marketing') === mkt); return {n: c.length, valor: c.reduce((a, v) => a + v.valor, 0), hoje: c.filter((v) => v.dia === hoje).length}; };
+    const prod = {};
+    vs.forEach((v) => { prod[v.produto] = (prod[v.produto] || 0) + 1; });
+    return {n, fat, ticket, hoje: deHoje.length, fatHoje: deHoje.reduce((a, v) => a + v.valor, 0), rec, dias, metas, diario, podio,
+      com: canal(false), mkt: canal(true), produtos: Object.entries(prod).sort((a, b) => b[1] - a[1]),
+      ultimas: [...vs].reverse().slice(0, 6)};
+  };
+
+  /* ---------- Monta a tela ---------- */
+  const root = document.getElementById('tv-root');
+  root.append(document.getElementById('tv-markup').content.cloneNode(true));
+  const $ = (k) => root.querySelector(`[data-k="${k}"]`);
+  const txt = (k, v) => { const e = $(k); if (e) e.textContent = v; };
+  const el = (tag, css, t) => { const e = document.createElement(tag); if (css) e.style.cssText = css; if (t != null) e.textContent = t; return e; };
+  const temDados = () => !!DADOS.at;
+
+  const desenhaTrilha = (r) => {
+    const box = $('trilha'); box.replaceChildren();
+    if (!temDados() || typeof d3 === 'undefined') return;
+    const max = METAS[METAS.length - 1][1];
+    const W = Math.max(300, box.clientWidth), fs = Math.max(13, Math.min(18, W / 72)), y = 8, h = 26, H = y + h + 6 + fs * 1.6 + 4;
+    const x = d3.scaleLinear([0, max], [0, W]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', `Progresso: ${F.brl(r.fat)} de ${F.brl(max)}`);
+    svg.append('rect').attr('x', 0).attr('y', y).attr('width', W).attr('height', h).attr('rx', h / 2).attr('fill', C.trilho);
+    const fw = Math.max(h, x(Math.min(r.fat, max)));
+    svg.append('rect').attr('x', 0).attr('y', y).attr('height', h).attr('rx', h / 2).attr('fill', C.lima).attr('width', fw);
+    const dentro = fw > W - 120;
+    svg.append('text').attr('x', dentro ? fw - 12 : fw + 10).attr('y', y + h / 2 + fs * .36).attr('text-anchor', dentro ? 'end' : 'start').attr('fill', dentro ? C.navy : C.off).attr('font-size', fs).attr('font-weight', 700).attr('font-family', 'Montserrat, sans-serif').text(F.brlCurto(r.fat));
+    const cores = {Meta: C.lima, Supermeta: C.lilas, Megameta: C.off};
+    METAS.forEach(([nivel, meta], i) => {
+      const last = i === METAS.length - 1, px = Math.min(W - 2, x(meta));
+      svg.append('line').attr('x1', px).attr('x2', px).attr('y1', y - 6).attr('y2', y + h + 6).attr('stroke', cores[nivel]).attr('stroke-width', 3).attr('stroke-linecap', 'round');
+      const t = svg.append('text').attr('x', px).attr('y', y + h + 6 + fs * 1.2).attr('text-anchor', last ? 'end' : 'middle').attr('fill', cores[nivel]).attr('font-size', fs).attr('font-weight', 700).attr('font-family', 'Montserrat, sans-serif');
+      t.append('tspan').text(nivel + ' ');
+      t.append('tspan').attr('font-weight', 500).attr('fill', C.muted).text(F.brlCurto(meta));
+    });
+  };
+
+  const desenhaMedidor = (r) => {
+    const box = $('medidor'); box.replaceChildren();
+    if (!temDados() || typeof d3 === 'undefined') return;
+    const alvo = Math.max(1, r.metas[0].vendas_dia);
+    const W = Math.max(200, box.clientWidth), H = 22, n = Math.min(alvo, 60), gap = n > 30 ? 2 : 4, w = (W - gap * (n - 1)) / n;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', `${r.hoje} de ${alvo} vendas hoje`);
+    const cheias = Math.round(Math.min(r.hoje, alvo) / alvo * n);
+    for (let i = 0; i < n; i++) svg.append('rect').attr('x', i * (w + gap)).attr('y', 0).attr('width', w).attr('height', H).attr('rx', Math.min(4, w / 2)).attr('fill', i < cheias ? C.lima : C.trilho);
+  };
+
+  const desenhaDiario = (r) => {
+    const box = $('diario'); box.replaceChildren();
+    if (!temDados() || typeof d3 === 'undefined') { box.append(el('p', '', 'Aguardando a primeira atualização.')); box.firstChild.className = 'tv-vazio'; return; }
+    const rows = r.diario;
+    const W = Math.max(300, box.clientWidth), H = Math.max(190, box.clientHeight || 220), fs = Math.max(12, Math.min(16, W / 45));
+    const m = {t: fs + 12, r: 6, b: fs + 12, l: fs * 2};
+    const max = d3.max(rows, (x) => x.n) || 1;
+    const x = d3.scaleBand(rows.map((x) => x.dia), [m.l, W - m.r]).padding(0.28);
+    const y = d3.scaleLinear([0, max * 1.12], [H - m.b, m.t]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Vendas por dia');
+    y.ticks(3).forEach((t) => {
+      svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(t)).attr('y2', y(t)).attr('stroke', C.line);
+      svg.append('text').attr('x', m.l - 8).attr('y', y(t) + fs * .35).attr('text-anchor', 'end').attr('fill', C.muted).attr('font-size', fs).attr('font-family', 'Montserrat, sans-serif').text(t);
+    });
+    const ult = rows[rows.length - 1].dia, bw = x.bandwidth();
+    const barras = svg.selectAll('path.b').data(rows.filter((x) => x.n > 0)).join('path').attr('class', 'b')
+      .attr('d', (d) => { const x0 = x(d.dia), y0 = y(d.n), y1 = y(0), rr = Math.min(4, bw / 2, y1 - y0); return `M${x0},${y1}V${y0 + rr}Q${x0},${y0} ${x0 + rr},${y0}H${x0 + bw - rr}Q${x0 + bw},${y0} ${x0 + bw},${y0 + rr}V${y1}Z`; })
+      .attr('fill', (d) => d.n === max ? C.lima : d.dia === ult ? C.lilas : C.roxo);
+    svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(max)).attr('y2', y(max)).attr('stroke', C.lima).attr('stroke-dasharray', '6 5').attr('opacity', .7);
+    svg.append('text').attr('x', W - m.r).attr('y', y(max) - 7).attr('text-anchor', 'end').attr('fill', C.lima).attr('font-size', fs).attr('font-weight', 700).attr('font-family', 'Montserrat, sans-serif').text(`recorde ${max}`);
+    const step = Math.ceil(rows.length / 6);
+    rows.forEach((d, i) => { if ((rows.length - 1 - i) % step === 0) svg.append('text').attr('x', x(d.dia) + bw / 2).attr('y', H - 4).attr('text-anchor', 'middle').attr('fill', d.dia === ult ? C.off : C.muted).attr('font-size', fs).attr('font-family', 'Montserrat, sans-serif').text(d.dia === ult ? 'hoje' : F.dm(d.dia)); });
+    const tip = el('div'); tip.className = 'tv-tip'; tip.hidden = true; box.append(tip);
+    barras.on('pointerenter', (ev, d) => {
+      tip.textContent = `${F.dm(d.dia)} · ${d.n} vendas · ${F.brl(d.v)}`; tip.hidden = false;
+      const bx = (x(d.dia) + bw / 2) / W * box.clientWidth; tip.style.left = Math.min(Math.max(0, bx - 90), Math.max(0, box.clientWidth - 220)) + 'px'; tip.style.top = '0px';
+    }).on('pointerleave', () => { tip.hidden = true; });
+  };
+
+  const desenhaPodio = (r) => {
+    const box = $('podio'); box.replaceChildren();
+    if (!temDados()) return;
+    if (!r.podio.length) { const p = el('p', '', 'Ainda sem vendas com cupom nos últimos 7 dias.'); p.className = 'tv-vazio'; box.append(p); return; }
+    r.podio.forEach((d, i) => {
+      const top = i === 0;
+      const card = el('div', `display:flex;align-items:center;gap:clamp(12px,1vw,20px);padding:${top ? 'clamp(10px,.75vw,15px)' : 'clamp(7px,.5vw,11px)'} clamp(14px,1.1vw,22px);border-radius:14px;background:${top ? C.lima : C.navy};color:${top ? C.navy : C.off};border:1px solid ${top ? C.lima : C.line};min-width:0`);
+      card.append(el('span', `font-family:var(--display);font-size:${top ? 'clamp(2rem,2.5vw,3.2rem)' : 'clamp(1.5rem,1.7vw,2.2rem)'};line-height:1;color:${top ? C.navy : C.lima};min-width:2ch`, `${i + 1}º`));
+      const b = el('div', 'display:flex;flex-direction:column;min-width:0;gap:2px');
+      b.append(el('span', `font-size:${top ? 'clamp(1.2rem,1.4vw,1.9rem)' : 'clamp(1rem,1.1vw,1.45rem)'};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`, d.vendedor));
+      b.append(el('span', `font-size:clamp(.85rem,.9vw,1.2rem);font-weight:500;color:${top ? C.navy : C.muted}`, `${F.int(d.vendas)} vendas · ${F.brl(d.valor)}`));
+      card.append(b); box.append(card);
+    });
+  };
+
+  const desenhaUltimas = (r) => {
+    const box = $('ultimas'); box.replaceChildren();
+    if (!temDados()) return;
+    r.ultimas.forEach((d, i) => {
+      const row = el('div', `display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:clamp(5px,.42vw,9px) 0;border-bottom:${i === r.ultimas.length - 1 ? '0' : '1px solid ' + C.line}`);
+      row.append(el('span', `width:10px;height:10px;border-radius:50%;background:${i === 0 ? C.lima : C.roxo};box-shadow:${i === 0 ? '0 0 0 5px rgba(204,246,8,.18)' : 'none'}`));
+      const t = el('span', 'font-size:clamp(.95rem,1vw,1.35rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis');
+      const mkt = d.vendedor === 'Marketing';
+      t.append(el('b', `font-weight:700;color:${i === 0 ? C.lima : mkt ? C.lilas : C.off}`, mkt ? 'Venda de marketing' : d.vendedor));
+      t.append(document.createTextNode(mkt ? ` · ${d.produto}` : ` vendeu ${d.produto}`));
+      row.append(t, el('span', `font-size:clamp(.82rem,.85vw,1.12rem);color:${C.muted};white-space:nowrap`, `${F.dm(d.quando)} ${String(d.quando).slice(11, 16)}`));
+      box.append(row);
+    });
+  };
+
+  const render = () => {
+    const r = calcula(), ok = temDados();
+    const v = (f) => ok ? f() : '—';
+    txt('atualizado', ok ? `${F.dm(DADOS.at)} ${DADOS.at.slice(11, 16)}` : '—');
+    txt('faturado', v(() => F.brl(r.fat)));
+    txt('vendas', v(() => F.int(r.n)));
+    txt('ticket', v(() => F.brl(r.ticket)));
+    txt('pctmeta', v(() => F.pct(r.metas[0].pct)));
+    txt('produtos', v(() => r.produtos.map(([p, n]) => `${p} ${F.int(n)}`).join('  ·  ') || 'Sem vendas ainda'));
+    const nv = (n) => '(' + F.int(n) + (n === 1 ? ' venda)' : ' vendas)');
+    txt('com_valor', v(() => F.brl(r.com.valor))); txt('com_n', ok ? nv(r.com.n) : '');
+    txt('mkt_valor', v(() => F.brl(r.mkt.valor))); txt('mkt_n', ok ? nv(r.mkt.n) : '');
+    r.metas.forEach((m) => {
+      const lane = root.querySelector(`[data-lane="${m.nivel}"]`);
+      const f = (k, val) => { lane.querySelector(`[data-f="${k}"]`).textContent = val; };
+      f('meta', F.brlCurto(m.meta));
+      f('falta', ok ? (m.falta ? F.brl(m.falta) : 'Batida!') : '—');
+      f('por_dia', ok ? F.brlCurto(m.por_dia) : '—');
+      f('vendas_dia', ok ? F.int(m.vendas_dia) : '—');
+      lane.classList.toggle('ok', ok && !m.falta);
+    });
+    txt('hoje', v(() => F.int(r.hoje)));
+    txt('hoje_meta', v(() => F.int(r.metas[0].vendas_dia)));
+    txt('fat_hoje', v(() => F.brl(r.fatHoje)));
+    txt('mkt_hoje', v(() => F.int(r.mkt.hoje)));
+    txt('recorde', v(() => F.int(r.rec[1])));
+    txt('recdia', v(() => r.rec[0] ? F.dm(r.rec[0]) : '—'));
+    txt('dias', F.int(r.dias));
+    desenhaTrilha(r); desenhaMedidor(r); desenhaDiario(r); desenhaPodio(r); desenhaUltimas(r);
+  };
+
+  /* ---------- Relógio e dicas ---------- */
+  const fase = () => { const t = new Date(); return t < ABRE ? 'antes' : t <= FECHA ? 'durante' : 'depois'; };
+  const tiles = ['dias', 'horas', 'min', 'seg'].map((l) => {
+    const t = el('span'); t.className = 'tv-tile';
+    const d = el('span', '', '00'); d.className = 'd';
+    const s = el('span', '', l); s.className = 'l';
+    t.append(d, s); $('relogio').append(t); return d;
+  });
+  let ultimoDia = hojeSP();
+  const tique = () => {
+    const f = fase();
+    root.querySelectorAll('.tv-fase').forEach((e) => { e.hidden = e.dataset.fase !== f; });
+    const s = Math.max(0, Math.floor(((f === 'antes' ? ABRE : FECHA) - new Date()) / 1000));
+    [Math.floor(s / 86400), Math.floor(s / 3600) % 24, Math.floor(s / 60) % 60, s % 60].forEach((v, i) => { tiles[i].textContent = String(v).padStart(2, '0'); });
+    if (hojeSP() !== ultimoDia) { ultimoDia = hojeSP(); render(); }
+  };
+  tique(); setInterval(tique, 1000);
+  let di = 0;
+  setInterval(() => { const ds = root.querySelectorAll('[data-dica]'); di = (di + 1) % ds.length; ds.forEach((e, k) => { e.hidden = k !== di; }); }, 20000);
+
+  render();
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
+  if (typeof d3 === 'undefined') window.addEventListener('load', render);
+
+  /* Tela da TV não apaga, onde o navegador deixa */
+  const acorda = () => { try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {} };
+  acorda(); document.addEventListener('visibilitychange', () => { if (!document.hidden) acorda(); });
+
+  /* ---------- Leitura da planilha (Apps Script) a cada minuto ---------- */
+  const pill = $('pill'), pillTxt = $('pilltxt');
+  const URL_DADOS = (window.TV_CONFIG || {}).scriptUrl || '';
+  let ultimoOk = 0, assinatura = '';
+  const jsonp = (url) => new Promise((ok, falha) => {
+    const cb = 'tvcb' + Date.now(), sc = document.createElement('script');
+    const fim = () => { delete window[cb]; sc.remove(); };
+    window[cb] = (d) => { fim(); ok(d); };
+    sc.onerror = () => { fim(); falha(new Error('jsonp')); };
+    sc.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb + '&t=' + Date.now();
+    document.head.append(sc);
+    setTimeout(() => { if (window[cb]) { fim(); falha(new Error('timeout')); } }, 20000);
+  });
+  const busca = async () => {
+    try { const r = await fetch(URL_DADOS + (URL_DADOS.includes('?') ? '&' : '?') + 't=' + Date.now(), {cache: 'no-store'}); if (!r.ok) throw 0; return await r.json(); }
+    catch (e) { return jsonp(URL_DADOS); }
+  };
+  const ciclo = async () => {
+    if (!URL_DADOS) { pill.hidden = false; pill.classList.add('erro'); pillTxt.textContent = 'Falta configurar o endereço da planilha'; return; }
+    try {
+      const d = await busca();
+      if (!d || !Array.isArray(d.vendas)) throw new Error('formato');
+      ultimoOk = Date.now(); pill.hidden = true;
+      const sig = JSON.stringify(d.vendas);
+      DADOS = d;
+      if (sig !== assinatura) { assinatura = sig; render(); } else { txt('atualizado', `${F.dm(d.at)} ${d.at.slice(11, 16)}`); }
+    } catch (e) {
+      if (!ultimoOk || Date.now() - ultimoOk > 5 * 60000) {
+        pill.hidden = false; pill.classList.add('erro');
+        pillTxt.textContent = ultimoOk ? `Sem conexão com a planilha desde ${agoraSP(new Date(ultimoOk)).slice(11, 16)}` : 'Conectando à planilha…';
+      }
+    }
+  };
+  ciclo(); setInterval(ciclo, 60000);
+  /* Recarrega a página uma vez por dia de madrugada, para pegar qualquer atualização da TV */
+  setInterval(() => { const h = agoraSP().slice(11, 16); if (h === '04:00') location.reload(); }, 60000);
+})();
+</script>
+</body>
+</html>
